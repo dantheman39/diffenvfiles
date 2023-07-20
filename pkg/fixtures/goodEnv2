@@ -1,0 +1,6 @@
+ABC="hey there"
+# COMMENT SHOULD BE IGNORED
+
+DEF= "what is up"
+SAME_KEY_DIFFERENT_VALUE="env1val2"
+ONLY_IN_ENV_2 = "only2"
