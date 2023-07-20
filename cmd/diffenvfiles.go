@@ -14,7 +14,7 @@ func Execute() {
 		Use:          "diffenvfiles envfile1 envfile2",
 		Short:        "Compare two dot-env files",
 		Long:         "Run this command to show what variables are different between two .env files",
-		Version:      "v1.1.0",
+		Version:      "v1.2.0",
 		Args:         cobra.ExactArgs(2),
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {

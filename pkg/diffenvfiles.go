@@ -76,9 +76,8 @@ func DiffEnvFiles(env1 EnvFile, env2 EnvFile, config Config) error {
 	} else {
 		fmt.Fprintln(w, "\nThe following variables are different between the two env files")
 		for _, sk := range sameKeysDifferentValues {
-			fmt.Fprintf(w, "  %s=\n", sk[0])
-			fmt.Fprintf(w, "    %s\n", sk[1])
-			fmt.Fprintf(w, "    %s\n", sk[2])
+			fmt.Fprintf(w, "  %s=%s\n", sk[0], sk[1])
+			fmt.Fprintf(w, "  %s=%s\n\n", sk[0], sk[2])
 		}
 	}
 
