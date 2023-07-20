@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tarfile
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -33,9 +34,13 @@ if __name__ == "__main__":
         env = os.environ.copy()
         env["GOOS"] = ops
         env["GOARCH"] = arch
+        file_name = f"diffenvfiles-{ops}-{arch}"
+        full_file_name = build_dir / file_name
         subprocess.run(
-            ["go", "build", "-o", build_dir / f"diffenvfiles-{ops}-{arch}", "main.go"],
+            ["go", "build", "-o", full_file_name, "main.go"],
             env=env,
         )
+        with tarfile.open(f"{full_file_name}.tar.gz", "w:gz") as tar:
+             tar.add(full_file_name, arcname=file_name)
 
     print("done")
