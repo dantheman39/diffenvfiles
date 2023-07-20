@@ -14,13 +14,17 @@ type EnvFile struct {
 	Data []byte
 }
 
-func DiffEnvFiles(env1 EnvFile, env2 EnvFile) error {
+type Config struct {
+	IgnoreQuotes bool
+}
+
+func DiffEnvFiles(env1 EnvFile, env2 EnvFile, config Config) error {
 	w := os.Stdout
-	parseResult1, err := parseContents(env1.Data)
+	parseResult1, err := parseContents(env1.Data, config)
 	if err != nil {
 		return err
 	}
-	parseResult2, err := parseContents(env2.Data)
+	parseResult2, err := parseContents(env2.Data, config)
 	if err != nil {
 		return err
 	}
@@ -113,7 +117,7 @@ type ParseContentsResult struct {
 	LineParsingErrors []LineParsingError
 }
 
-func parseContents(contents []byte) (ParseContentsResult, error) {
+func parseContents(contents []byte, config Config) (ParseContentsResult, error) {
 	lines := splitlines(string(contents))
 
 	envVars := [][]string{}
@@ -132,10 +136,25 @@ func parseContents(contents []byte) (ParseContentsResult, error) {
 		if len(varNameAndVal) > 1 {
 			varVal = strings.TrimSpace(strings.Join(varNameAndVal[1:], "="))
 		}
+		if config.IgnoreQuotes {
+			varVal = trimQuotes(varVal)
+		}
 		envVars = append(envVars, []string{varName, varVal})
 	}
 	sort.Sort(sortableByFirst(envVars))
 	return ParseContentsResult{EnvVars: envVars, LineParsingErrors: []LineParsingError{}}, nil
+}
+
+func trimQuotes(s string) string {
+	if len(s) <= 2 {
+		return s
+	}
+	first := s[0:1]
+	last := s[len(s)-1:]
+	if first == "'" && last == "'" || first == "\"" && last == "\"" {
+		return s[1 : len(s)-1]
+	}
+	return s
 }
 
 func extractOnlyInA(listA [][]string, listB [][]string) ([][]string, [][]string) {
