@@ -1,0 +1,41 @@
+#!/usr/bin/env python
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("error: pass a \"version\" argument, starting with lower v and semver, like v0.0.1")
+        sys.exit(1)
+    version = sys.argv[1]
+
+    build_dir = Path(__file__).parent.parent / "build"
+    if not build_dir.exists():
+        print("no build folder, that's weird")
+        sys.exit(1)
+
+    build_dir = build_dir / version
+    if not build_dir.exists():
+        os.mkdir(build_dir)
+
+    arches = (
+        ("linux", "amd64"),
+        ("linux", "arm64"),
+        ("darwin", "amd64"),
+        ("darwin", "arm64"),
+        ("windows", "amd64"),
+    )
+
+    for ops, arch in arches:
+        print(f"building {ops}/{arch}")
+        env = os.environ.copy()
+        env["GOOS"] = ops
+        env["GOARCH"] = arch
+        subprocess.run(
+            ["go", "build", "-o", build_dir / f"diffenvfiles-{ops}-{arch}", "main.go"],
+            env=env,
+        )
+
+    print("done")
